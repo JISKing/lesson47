@@ -1,60 +1,64 @@
-import React, { useState } from "react";
+import React from "react";
+import {Formik, Form, Field} from 'formik'
 
 function App() {
-  const [name, setName] = useState("");
-  const [login, setLogin] = useState("");
-  const [age, setAge] = useState("");
-  const [email, setEmail] = useState("");
-
-  const [nameValid, setNameValid] = useState(true);
-  const [loginValid, setLoginValid] = useState(true);
-  const [ageValid, setAgeValid] = useState(true);
-  const [emailValid, setEmailValid] = useState(true);
-
-  const submit = (e) => {
-    e.preventDefault();
-    console.log(name, login, age, email);
+  const initialValues = {
+    name: "",
+    login: "",
+    age: "",
+    email: "",
   };
 
-  const nameChange = (e) => {
-    setName(e.target.value);
-    setNameValid(/^[a-zA-Z]+$/.test(e.target.value) && e.target.value.length >= 1);
+  const validate = (values) => {
+    const errors = {};
+
+    if (!/^[a-zA-Z]+$/.test(values.name) || values.name.length < 1) {
+      errors.name = "Enter correct Name";
+    }
+
+    if (values.login.length < 5) {
+      errors.login = "Enter correct Login";
+    }
+
+    if (values.age < 18) {
+      errors.age = "Enter correct Age";
+    }
+
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
+      errors.email = "Enter correct Email";
+    }
+
+    return errors;
   };
-  
-  const loginChange = (e) => {
-    setLogin(e.target.value);
-    setLoginValid(e.target.value.length >= 5);
-  };
-  
-  const ageChange = (e) => {
-    setAge(e.target.value);
-    setAgeValid(e.target.value >= 18);
-  };
-  
-  const emailChange = (e) => {
-    setEmail(e.target.value);
-    setEmailValid(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(e.target.value));
+
+  const handleSubmit = (values) => {
+    console.log(values);
   };
 
   return (
     <div className="wrapper">
-      <form onSubmit={submit}>
-        <label>Name</label>
-        <input className={nameValid ? "" : "invalid"} onChange={nameChange} />
-        {!nameValid && <p>Enter correct Name</p>}
-        <label>Login</label>
-        <input className={loginValid ? "" : "invalid"} onChange={loginChange} />
-        {!loginValid && <p>Enter correct Name</p>}
-        <label>Age</label>
-        <input className={ageValid ? "" : "invalid"} onChange={ageChange} type="number" />
-        {!ageValid && <p>Enter correct Name</p>}
-        <label>Email</label>
-        <input className={emailValid ? "" : "invalid"} onChange={emailChange} />
-        {!emailValid && <p>Enter correct Name</p>}
-        <button type="submit">Sign in</button>
-      </form>
+      <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
+        {({values, errors, touched, handleChange, handleBlur, handleSubmit}) => (
+          <Form onSubmit={handleSubmit}>
+            <label>Name</label>
+            <Field className={touched.name && errors.name ? "invalid" : ""} name="name" onChange={handleChange} onBlur={handleBlur} />
+            {touched.name && errors.name && <p>{errors.name}</p>}
+            <label>Login</label>
+            <Field className={touched.login && errors.login ? "invalid" : ""} name="login" onChange={handleChange} onBlur={handleBlur} />
+            {touched.login && errors.login && <p>{errors.login}</p>}
+            <label>Age</label>
+            <Field className={touched.age && errors.age ? "invalid" : ""} name="age" type="number" onChange={handleChange} onBlur={handleBlur} />
+            {touched.age && errors.age && <p>{errors.age}</p>}
+            <label>Email</label>
+            <Field className={touched.email && errors.email ? "invalid" : ""} name="email" onChange={handleChange} onBlur={handleBlur} />
+            {touched.email && errors.email && <p>{errors.email}</p>}
+            <button type="submit">Sign in</button>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 }
 
 export default App;
+
