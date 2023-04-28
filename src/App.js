@@ -1,64 +1,36 @@
 import React from "react";
-import {Formik, Form, Field} from 'formik'
+import { useForm } from "react-hook-form";
 
 function App() {
-  const initialValues = {
-    name: "",
-    login: "",
-    age: "",
-    email: "",
-  };
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const validate = (values) => {
-    const errors = {};
-
-    if (!/^[a-zA-Z]+$/.test(values.name) || values.name.length < 1) {
-      errors.name = "Enter correct Name";
-    }
-
-    if (values.login.length < 5) {
-      errors.login = "Enter correct Login";
-    }
-
-    if (values.age < 18) {
-      errors.age = "Enter correct Age";
-    }
-
-    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
-      errors.email = "Enter correct Email";
-    }
-
-    return errors;
-  };
-
-  const handleSubmit = (values) => {
-    console.log(values);
+  const onSubmit = (data) => {
+    console.log(data);
   };
 
   return (
     <div className="wrapper">
-      <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
-        {({values, errors, touched, handleChange, handleBlur, handleSubmit}) => (
-          <Form onSubmit={handleSubmit}>
-            <label>Name</label>
-            <Field className={touched.name && errors.name ? "invalid" : ""} name="name" onChange={handleChange} onBlur={handleBlur} />
-            {touched.name && errors.name && <p>{errors.name}</p>}
-            <label>Login</label>
-            <Field className={touched.login && errors.login ? "invalid" : ""} name="login" onChange={handleChange} onBlur={handleBlur} />
-            {touched.login && errors.login && <p>{errors.login}</p>}
-            <label>Age</label>
-            <Field className={touched.age && errors.age ? "invalid" : ""} name="age" type="number" onChange={handleChange} onBlur={handleBlur} />
-            {touched.age && errors.age && <p>{errors.age}</p>}
-            <label>Email</label>
-            <Field className={touched.email && errors.email ? "invalid" : ""} name="email" onChange={handleChange} onBlur={handleBlur} />
-            {touched.email && errors.email && <p>{errors.email}</p>}
-            <button type="submit">Sign in</button>
-          </Form>
-        )}
-      </Formik>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <label>Name</label>
+        <input {...register("name", { required: true, pattern: /^[a-zA-Z]+$/ })} />
+        {errors.name?.type === "required" && <p>Enter Name</p>}
+        {errors.name?.type === "pattern" && <p>Enter correct Name</p>}
+        <label>Login</label>
+        <input {...register("login", { required: true, minLength: 5 })} />
+        {errors.login?.type === "required" && <p>Enter Login</p>}
+        {errors.login?.type === "minLength" && <p>Login should be at least 5 characters</p>}
+        <label>Age</label>
+        <input {...register("age", { required: true, min: 18 })} type="number" />
+        {errors.age?.type === "required" && <p>Enter Age</p>}
+        {errors.age?.type === "min" && <p>Age should be at least 18 years old</p>}
+        <label>Email</label>
+        <input {...register("email", { required: true, pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i })} />
+        {errors.email?.type === "required" && <p>Enter Email</p>}
+        {errors.email?.type === "pattern" && <p>Enter correct Email</p>}
+        <button type="submit">Sign in</button>
+      </form>
     </div>
   );
 }
 
 export default App;
-
