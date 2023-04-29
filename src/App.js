@@ -2,10 +2,11 @@ import React from "react";
 import { useForm } from "react-hook-form";
 
 function App() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({mode: "onTouched"});
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = (value) => {
+    console.log(value);
+    reset();
   };
 
   return (
